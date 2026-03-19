@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 
 // ─── TOOL DEFINITIONS ───
 const TOOLS = {
@@ -763,7 +763,10 @@ export default function ParkdaleCommandCenter() {
       <div style={{ borderBottom: "1px solid #E8E0D8", padding: "8px 24px", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 8 }}>
         <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
           {[{ key: "overview", label: "Overview" }, ...PHASES.map(p => ({ key: `phase-${p.id}`, label: `P${p.id}` })), { key: "workflows", label: "Workflows" }].map(nav => (
-            <button key={nav.key} onClick={() => setActiveView(nav.key)} style={{ padding: "6px 14px", borderRadius: 6, border: "none", cursor: "pointer", fontSize: 12, fontWeight: 600, fontFamily: "monospace", background: activeView === nav.key ? "#E8E0D8" : "transparent", color: activeView === nav.key ? "#2D3436" : "#8A9199" }}>{nav.label}</button>
+            <button key={nav.key} onClick={() => setActiveView(nav.key)} style={{ padding: "6px 14px", borderRadius: 6, border: activeView === nav.key ? "1px solid #D4CBC2" : "1px solid transparent", cursor: "pointer", fontSize: 12, fontWeight: 600, fontFamily: "monospace", background: activeView === nav.key ? "#FFFFFF" : "transparent", color: activeView === nav.key ? "#2D3436" : "#8A9199", boxShadow: activeView === nav.key ? "0 1px 3px rgba(0,0,0,0.08)" : "none", transition: "all 0.15s" }}
+              onMouseEnter={e => { if (activeView !== nav.key) { e.currentTarget.style.background = "#F5F0EA"; e.currentTarget.style.color = "#2D3436"; } }}
+              onMouseLeave={e => { if (activeView !== nav.key) { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#8A9199"; } }}
+            >{nav.label}</button>
           ))}
         </div>
         <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
@@ -777,7 +780,10 @@ export default function ParkdaleCommandCenter() {
             <option value="in_progress">In Progress</option>
             <option value="complete">Complete</option>
           </select>
-          <button onClick={() => setShowDataFlow(!showDataFlow)} style={{ padding: "4px 10px", borderRadius: 6, border: `1px solid ${showDataFlow ? "#4A90D9" : "#D4CBC2"}`, background: showDataFlow ? "#2E8B6E15" : "transparent", color: showDataFlow ? "#4A90D9" : "#8A9199", cursor: "pointer", fontSize: 11, fontFamily: "monospace" }}>{showDataFlow ? "\u25C6" : "\u25C7"} Data Flow</button>
+          <button onClick={() => setShowDataFlow(!showDataFlow)} style={{ padding: "4px 10px", borderRadius: 6, border: `1px solid ${showDataFlow ? "#4A90D9" : "#D4CBC2"}`, background: showDataFlow ? "#4A90D915" : "#FFFFFF", color: showDataFlow ? "#4A90D9" : "#8A9199", cursor: "pointer", fontSize: 11, fontFamily: "monospace", transition: "all 0.15s" }}
+            onMouseEnter={e => { if (!showDataFlow) { e.currentTarget.style.background = "#F5F0EA"; e.currentTarget.style.color = "#2D3436"; } }}
+            onMouseLeave={e => { if (!showDataFlow) { e.currentTarget.style.background = "#FFFFFF"; e.currentTarget.style.color = "#8A9199"; } }}
+          >{showDataFlow ? "\u25C6 Hide" : "\u25C7 Show"} Data Inputs/Outputs</button>
           {isAdmin && <button onClick={resetAll} style={{ padding: "4px 10px", borderRadius: 6, border: "1px solid #D4CBC2", background: "transparent", color: "#C74848", cursor: "pointer", fontSize: 11, fontFamily: "monospace" }}>Reset</button>}
         </div>
       </div>
@@ -804,9 +810,9 @@ function OverviewView({ phases, phaseStats, tasks, getStatus, setActiveView, sho
         const ready = pt.filter(t => canStart(t) && getStatus(t.id) === "not_started").length;
         const tSet = new Set(); pt.forEach(t => t.tools.forEach(tool => tSet.add(tool)));
         return (
-          <div key={phase.id} onClick={() => setActiveView(`phase-${phase.id}`)} style={{ background: "#FFFFFF", border: `1px solid ${stats.pct === 100 ? "#22c55e40" : "#E8E0D8"}`, borderRadius: 12, padding: 20, cursor: "pointer", transition: "all 0.2s", position: "relative", overflow: "hidden", boxShadow: "0 1px 3px rgba(0,0,0,0.06)" }}
-            onMouseEnter={e => { e.currentTarget.style.borderColor = phase.color; e.currentTarget.style.transform = "translateY(-2px)"; }}
-            onMouseLeave={e => { e.currentTarget.style.borderColor = stats.pct === 100 ? "#22c55e40" : "#E8E0D8"; e.currentTarget.style.transform = "translateY(0)"; }}>
+          <div key={phase.id} onClick={() => setActiveView(`phase-${phase.id}`)} style={{ background: "#FFFFFF", border: `1px solid ${stats.pct === 100 ? "#3D997040" : "#E8E0D8"}`, borderRadius: 12, padding: 20, cursor: "pointer", transition: "all 0.25s ease", position: "relative", overflow: "hidden", boxShadow: "0 1px 3px rgba(0,0,0,0.06)" }}
+            onMouseEnter={e => { e.currentTarget.style.borderColor = phase.color; e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = `0 4px 12px ${phase.color}20`; }}
+            onMouseLeave={e => { e.currentTarget.style.borderColor = stats.pct === 100 ? "#3D997040" : "#E8E0D8"; e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.06)"; }}>
             <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: phase.color, opacity: 0.8 }} />
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 12 }}>
               <div><div style={{ fontSize: 10, color: phase.color, fontFamily: "monospace", letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: 4 }}>Phase {phase.id} · {phase.weeks}</div><h3 style={{ margin: 0, fontSize: 16, fontWeight: 700 }}>{phase.name}</h3></div>
@@ -823,20 +829,30 @@ function OverviewView({ phases, phaseStats, tasks, getStatus, setActiveView, sho
               {crit.map(t => <div key={t.id} style={{ fontSize: 12, color: getStatus(t.id) === "complete" ? "#3D9970" : "#2D3436", marginBottom: 4, display: "flex", alignItems: "center", gap: 6 }}><span style={{ color: getStatus(t.id) === "complete" ? "#3D9970" : getStatus(t.id) === "in_progress" ? "#C4883D" : "#A0A8B0" }}>{getStatus(t.id) === "complete" ? "\u25CF" : getStatus(t.id) === "in_progress" ? "\u25D0" : "\u25CB"}</span>{t.title}</div>)}
             </div>}
             <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>{Array.from(tSet).map(tool => <span key={tool} style={{ fontSize: 10, padding: "2px 6px", borderRadius: 4, background: `${TOOLS[tool]?.color}15`, color: TOOLS[tool]?.color, fontFamily: "monospace" }}>{TOOLS[tool]?.icon} {TOOLS[tool]?.name}</span>)}</div>
-            <div style={{ position: "absolute", bottom: 8, right: 12, fontSize: 10, color: "#A0A8B0", fontFamily: "monospace" }}>click to drill in {"\u2192"}</div>
+            <div style={{ marginTop: 14, padding: "8px 12px", background: `${phase.color}10`, border: `1px solid ${phase.color}25`, borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, color: phase.color, fontSize: 12, fontWeight: 600, fontFamily: "monospace" }}>View {stats.total} Tasks {"\u2192"}</div>
           </div>);
       })}
     </div>
     {showDataFlow && <div style={{ background: "#FFFFFF", border: "1px solid #E8E0D8", borderRadius: 12, padding: 24, marginBottom: 24 }}>
-      <h3 style={{ margin: "0 0 16px", fontSize: 14, fontFamily: "monospace", color: "#4A90D9" }}>Cross-Phase Data Flow</h3>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr auto 1fr auto 1fr auto 1fr", gap: 8, alignItems: "center" }}>
-        {phases.map((phase, idx) => (<React.Fragment key={phase.id}>
-          <div style={{ background: "#FAF7F2", border: `1px solid ${phase.color}40`, borderRadius: 8, padding: 12, textAlign: "center" }}>
-            <div style={{ fontSize: 11, fontWeight: 700, color: phase.color, marginBottom: 6 }}>P{phase.id}: {phase.name}</div>
-            <div style={{ fontSize: 10, color: "#6B7B8D" }}>{phase.id === 1 && "Intel, strategy, tiers, copy, renders, landing page, CRM"}{phase.id === 2 && "Pitch deck, emails, outreach, AI concierge, stress-test"}{phase.id === 3 && "Live automations, outreach, content, monitoring"}{phase.id === 4 && "Urgency copy, scarcity triggers, full-court press"}</div>
-          </div>
-          {idx < 3 && <div style={{ textAlign: "center", padding: "0 4px" }}><div style={{ fontSize: 18, color: "#A0A8B0" }}>{"\u2192"}</div><div style={{ fontSize: 9, color: "#8A9199", fontFamily: "monospace", maxWidth: 120, lineHeight: 1.3 }}>{idx === 0 && "Tiers, copy, renders, prospect CSVs, GHL pipeline"}{idx === 1 && "Pitch deck, Instantly campaigns, email seqs, bot"}{idx === 2 && "Performance data, metrics, remaining inventory"}</div></div>}
-        </React.Fragment>))}
+      <h3 style={{ margin: "0 0 4px", fontSize: 14, fontFamily: "monospace", color: "#4A90D9" }}>Cross-Phase Data Flow</h3>
+      <p style={{ margin: "0 0 16px", fontSize: 12, color: "#8A9199" }}>What data moves between each phase of the campaign</p>
+      <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
+        {phases.map((phase, idx) => {
+          const arrows = ["Tiers, copy, renders, prospect CSVs, GHL pipeline", "Pitch deck, Instantly campaigns, email sequences, concierge bot", "Performance data, campaign metrics, remaining tier inventory"];
+          return (<React.Fragment key={phase.id}>
+            <div style={{ background: "#FAF7F2", border: `1px solid ${phase.color}40`, borderRadius: 8, padding: 14, display: "flex", gap: 12, alignItems: "center" }}>
+              <div style={{ width: 36, height: 36, borderRadius: 8, background: `${phase.color}18`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 800, color: phase.color, fontFamily: "monospace", flexShrink: 0 }}>{phase.id}</div>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: 13, fontWeight: 600, color: "#2D3436" }}>{phase.name}</div>
+                <div style={{ fontSize: 11, color: "#6B7B8D", marginTop: 2 }}>{phase.id === 1 && "Intel, strategy, tiers, copy, renders, landing page, CRM"}{phase.id === 2 && "Pitch deck, emails, outreach, AI concierge, stress-test"}{phase.id === 3 && "Live automations, outreach, content, monitoring"}{phase.id === 4 && "Urgency copy, scarcity triggers, full-court press"}</div>
+              </div>
+            </div>
+            {idx < 3 && <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 0 6px 16px" }}>
+              <div style={{ fontSize: 16, color: phase.color }}>{"\u2193"}</div>
+              <div style={{ fontSize: 11, color: "#8A9199", fontFamily: "monospace", fontStyle: "italic" }}>{arrows[idx]}</div>
+            </div>}
+          </React.Fragment>);
+        })}
       </div>
     </div>}
     <div style={{ background: "#FFFFFF", border: "1px solid #E8E0D8", borderRadius: 12, padding: 16 }}>
@@ -853,7 +869,10 @@ function PhaseDetailView({ phase, tasks, allTasks, getStatus, toggleTask, toggle
   if (!phase) return null;
   return (<div>
     <div style={{ marginBottom: 24 }}>
-      <button onClick={() => setActiveView("overview")} style={{ background: "none", border: "none", color: "#8A9199", cursor: "pointer", fontSize: 12, fontFamily: "monospace", padding: 0, marginBottom: 8 }}>{"\u2190"} Back to Overview</button>
+      <button onClick={() => setActiveView("overview")} style={{ background: "#F5F0EA", border: "1px solid #E8E0D8", color: "#6B7B8D", cursor: "pointer", fontSize: 12, fontFamily: "monospace", padding: "6px 14px", marginBottom: 12, borderRadius: 6, transition: "all 0.15s" }}
+        onMouseEnter={e => { e.currentTarget.style.background = "#E8E0D8"; e.currentTarget.style.color = "#2D3436"; }}
+        onMouseLeave={e => { e.currentTarget.style.background = "#F5F0EA"; e.currentTarget.style.color = "#6B7B8D"; }}
+      >{"\u2190"} Back to Overview</button>
       <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
         <div style={{ width: 4, height: 40, background: phase.color, borderRadius: 2 }} />
         <div><div style={{ fontSize: 10, color: phase.color, fontFamily: "monospace", letterSpacing: "1.5px", textTransform: "uppercase" }}>Phase {phase.id} · {phase.weeks}</div><h2 style={{ margin: 0, fontSize: 22, fontWeight: 700 }}>{phase.name}</h2></div>
@@ -863,16 +882,20 @@ function PhaseDetailView({ phase, tasks, allTasks, getStatus, toggleTask, toggle
       {tasks.map(task => {
         const status = getStatus(task.id); const expanded = expandedTasks[task.id]; const ready = canStart(task); const blocked = !ready && status === "not_started";
         const completedSubs = task.subtasks.filter((_, i) => subtaskStatus[`${task.id}-${i}`]).length;
-        return (<div key={task.id} style={{ background: "#FFFFFF", border: `1px solid ${blocked ? "#ef444440" : status === "complete" ? "#22c55e30" : "#E8E0D8"}`, borderRadius: 10, overflow: "hidden", boxShadow: "0 1px 3px rgba(0,0,0,0.06)" }}>
-          <div style={{ padding: "14px 16px", cursor: "pointer" }} onClick={() => toggleExpand(task.id)}>
+        return (<div key={task.id} style={{ background: "#FFFFFF", border: `1px solid ${blocked ? "#C7484830" : status === "complete" ? "#3D997030" : "#E8E0D8"}`, borderRadius: 10, overflow: "hidden", boxShadow: "0 1px 3px rgba(0,0,0,0.06)", transition: "border-color 0.2s" }}
+            onMouseEnter={e => { if (!expanded) e.currentTarget.style.borderColor = "#B8C0C8"; }}
+            onMouseLeave={e => { e.currentTarget.style.borderColor = blocked ? "#C7484830" : status === "complete" ? "#3D997030" : "#E8E0D8"; }}>
+          <div style={{ padding: "14px 16px", cursor: "pointer", transition: "background 0.15s", borderRadius: expanded ? "10px 10px 0 0" : 10 }} onClick={() => toggleExpand(task.id)}
+            onMouseEnter={e => { e.currentTarget.style.background = "#F9F6F1"; }}
+            onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}>
             <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
               <button onClick={e => { e.stopPropagation(); if (!blocked) toggleTask(task.id); }}
-                style={{ width: 28, height: 28, borderRadius: 8, border: `2px solid ${blocked ? "#A0A8B0" : sC[status]}`, background: status === "complete" ? "#22c55e20" : status === "in_progress" ? "#f59e0b20" : "transparent", color: sC[status], cursor: (blocked || !isAdmin) ? "not-allowed" : "pointer", fontSize: 14, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, opacity: blocked ? 0.4 : 1 }}
+                style={{ width: 28, height: 28, borderRadius: 8, border: `2px solid ${blocked ? "#A0A8B0" : sC[status]}`, background: status === "complete" ? "#3D997020" : status === "in_progress" ? "#D4A85320" : "transparent", color: sC[status], cursor: (blocked || !isAdmin) ? "not-allowed" : "pointer", fontSize: 14, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, opacity: blocked ? 0.4 : 1 }}
                 title={blocked ? "Blocked" : `Click to cycle: ${sL[status]}`}>{sI[status]}</button>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
                   <span style={{ fontSize: 14, fontWeight: 600, color: status === "complete" ? "#3D9970" : blocked ? "#8A9199" : "#2D3436" }}>{task.title}</span>
-                  {task.critical && <span style={{ fontSize: 9, padding: "1px 6px", borderRadius: 4, background: "#C7484820", color: "#D4A853", fontFamily: "monospace", fontWeight: 600 }}>CRITICAL</span>}
+                  {task.critical && <span style={{ fontSize: 9, padding: "1px 6px", borderRadius: 4, background: "#C7484815", color: "#C74848", fontFamily: "monospace", fontWeight: 600 }}>CRITICAL</span>}
                   {blocked && <span style={{ fontSize: 9, padding: "1px 6px", borderRadius: 4, background: "#C7484815", color: "#6B7B8D", fontFamily: "monospace" }}>BLOCKED</span>}
                   {ready && status === "not_started" && !blocked && <span style={{ fontSize: 9, padding: "1px 6px", borderRadius: 4, background: "#2E8B6E15", color: "#4A90D9", fontFamily: "monospace" }}>READY</span>}
                 </div>
@@ -881,7 +904,10 @@ function PhaseDetailView({ phase, tasks, allTasks, getStatus, toggleTask, toggle
                   {task.subtasks.length > 0 && <span style={{ fontSize: 10, color: "#8A9199", fontFamily: "monospace" }}>{completedSubs}/{task.subtasks.length} subtasks</span>}
                 </div>
               </div>
-              <span style={{ fontSize: 16, color: "#A0A8B0", transform: expanded ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s", flexShrink: 0 }}>{"\u25BE"}</span>
+              <div style={{ display: "flex", alignItems: "center", gap: 4, flexShrink: 0, padding: "4px 8px", borderRadius: 6, background: expanded ? "#2E8B6E10" : "#F5F0EA", transition: "all 0.2s" }}>
+                <span style={{ fontSize: 10, color: expanded ? "#2E8B6E" : "#8A9199", fontFamily: "monospace" }}>{expanded ? "Collapse" : "Expand"}</span>
+                <span style={{ fontSize: 14, color: expanded ? "#2E8B6E" : "#8A9199", transform: expanded ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s" }}>{"\u25BE"}</span>
+              </div>
             </div>
             {/* APPLIED TO — always visible */}
             <div style={{ marginTop: 10, marginLeft: 40, padding: "8px 12px", background: "#F5F0EA", borderLeft: "3px solid #C4883D40", borderRadius: "0 6px 6px 0" }}>
@@ -900,7 +926,7 @@ function PhaseDetailView({ phase, tasks, allTasks, getStatus, toggleTask, toggle
                   <div style={{ fontSize: 11, color: "#6B7B8D", lineHeight: 1.5 }}>{a.how}</div>
                 </div>); })}
             </div>}
-            {task.appliedTo && task.appliedTo.length > 0 && task.appliedTo[0].task === null && <div style={{ marginBottom: 16, padding: "8px 10px", background: "#FAF7F2", borderRadius: 6, borderLeft: "3px solid #22c55e30" }}>
+            {task.appliedTo && task.appliedTo.length > 0 && task.appliedTo[0].task === null && <div style={{ marginBottom: 16, padding: "8px 10px", background: "#FAF7F2", borderRadius: 6, borderLeft: "3px solid #3D997030" }}>
               <div style={{ fontSize: 10, color: "#3D9970", textTransform: "uppercase", letterSpacing: "1px", marginBottom: 4, fontFamily: "monospace", fontWeight: 600 }}>Endpoint</div>
               <div style={{ fontSize: 11, color: "#6B7B8D", lineHeight: 1.5 }}>{task.appliedTo[0].how}</div>
             </div>}
@@ -924,7 +950,7 @@ function PhaseDetailView({ phase, tasks, allTasks, getStatus, toggleTask, toggle
               <div style={{ fontSize: 10, color: "#8A9199", textTransform: "uppercase", letterSpacing: "1px", marginBottom: 8, fontFamily: "monospace" }}>Subtasks</div>
               {task.subtasks.map((sub, i) => { const done = subtaskStatus[`${task.id}-${i}`]; return (
                 <div key={i} onClick={e => { e.stopPropagation(); toggleSubtask(task.id, i); }} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12, padding: "6px 8px", borderRadius: 6, background: "#FAF7F2", cursor: "pointer", color: done ? "#4A90D9" : "#6B7B8D", marginBottom: 4 }}>
-                  <span style={{ width: 16, height: 16, borderRadius: 4, border: `1.5px solid ${done ? "#3D9970" : "#B8C0C8"}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, flexShrink: 0, background: done ? "#22c55e20" : "transparent" }}>{done ? "\u2713" : ""}</span>
+                  <span style={{ width: 16, height: 16, borderRadius: 4, border: `1.5px solid ${done ? "#3D9970" : "#B8C0C8"}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, flexShrink: 0, background: done ? "#3D997020" : "transparent" }}>{done ? "\u2713" : ""}</span>
                   <span style={{ textDecoration: done ? "line-through" : "none", opacity: done ? 0.6 : 1 }}>{sub}</span>
                 </div>); })}
             </div>}
@@ -951,10 +977,15 @@ function WorkflowsView({ workflows }) {
     <div style={{ marginBottom: 24 }}><h2 style={{ margin: 0, fontSize: 18, fontWeight: 700 }}>Tool Stacking Workflows</h2><p style={{ margin: "8px 0 0", fontSize: 13, color: "#6B7B8D" }}>How tools chain together for maximum impact. Each workflow shows the exact data handoff between tools.</p></div>
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
       {workflows.map(wf => { const expanded = expandedWf === wf.id; return (
-        <div key={wf.id} style={{ background: "#FFFFFF", border: "1px solid #E8E0D8", borderRadius: 12, overflow: "hidden" }}>
-          <div onClick={() => setExpandedWf(expanded ? null : wf.id)} style={{ padding: "16px 20px", cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <div key={wf.id} style={{ background: "#FFFFFF", border: "1px solid #E8E0D8", borderRadius: 12, overflow: "hidden", boxShadow: "0 1px 3px rgba(0,0,0,0.06)" }}>
+          <div onClick={() => setExpandedWf(expanded ? null : wf.id)} style={{ padding: "16px 20px", cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center", transition: "background 0.15s" }}
+            onMouseEnter={e => { e.currentTarget.style.background = "#F9F6F1"; }}
+            onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}>
             <div><div style={{ fontSize: 16, fontWeight: 700 }}>{wf.name}</div><div style={{ fontSize: 12, color: "#6B7B8D", marginTop: 4 }}><span style={{ fontFamily: "monospace", fontSize: 10, color: "#8A9199" }}>{wf.phase}</span><span style={{ margin: "0 8px", color: "#D4CBC2" }}>{"\u00B7"}</span>{wf.description}</div></div>
-            <span style={{ fontSize: 16, color: "#A0A8B0", transform: expanded ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s" }}>{"\u25BE"}</span>
+            <div style={{ display: "flex", alignItems: "center", gap: 4, flexShrink: 0, padding: "4px 8px", borderRadius: 6, background: expanded ? "#2E8B6E10" : "#F5F0EA" }}>
+              <span style={{ fontSize: 10, color: expanded ? "#2E8B6E" : "#8A9199", fontFamily: "monospace" }}>{expanded ? "Collapse" : "Expand"}</span>
+              <span style={{ fontSize: 14, color: expanded ? "#2E8B6E" : "#8A9199", transform: expanded ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s" }}>{"\u25BE"}</span>
+            </div>
           </div>
           {expanded && <div style={{ borderTop: "1px solid #E8E0D8", padding: 20 }}>
             {wf.steps.map((step, idx) => { const tool = TOOLS[step.tool]; return (
